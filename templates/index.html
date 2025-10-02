@@ -1,0 +1,99 @@
+{% extends "header.html" %}
+
+{% block title %}Dashboard - HelioSync{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h1 class="mb-4">Dashboard</h1>
+</div>
+  <div class="row">
+    {% for plant in plants %}
+    <div class="col-md-4 mb-4">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">{{ plant.name }}</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Представител:</strong> {{ plant.representative }}</p>
+          <p><strong>Производство:</strong> {{ plant.production_kw }} kW</p>
+
+          {% if plant.alarm %}
+            <div class="alert alert-danger">Има аларми!</div>
+          {% else %}
+            <div class="alert alert-info">Няма аларми</div>
+          {% endif %}
+
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-danger btn-sm">Ръчно Изключване</button>
+            <button class="btn btn-primary btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#scheduleModal-{{ plant.id }}">
+              Създай График
+            </button>
+          </div>
+
+          <hr>
+          <p>
+            Прекъсвач:
+            {% if plant.relay %}
+              <span class="badge bg-success">Включено</span>
+            {% else %}
+              <span class="badge bg-danger">Изключено</span>
+            {% endif %}
+          </p>
+
+          <p>
+            Телемеханика (URNA):
+            <input type="checkbox" {% if plant.telemechanics %}checked{% endif %}>
+          </p>
+
+          <a href="#" class="btn btn-link">Детайли</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="scheduleModal-{{ plant.id }}" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">Планиран контрол за {{ plant.name }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <!-- Дата -->
+              <div class="col-md-4 border-end">
+                <h6>Избери дата</h6>
+                <input type="date" id="date-{{ plant.id }}" class="form-control mb-3">
+              </div>
+              <!-- Часове -->
+              <div class="col-md-8">
+                <h6>График по часове</h6>
+                <div class="row">
+                  {% for hour in range(0, 24) %}
+                  <div class="col-3 mb-2">
+                    <label class="fw-bold">{{ "%02d:00"|format(hour) }}</label>
+                    <select class="form-select form-select-sm schedule-input"
+                            data-hour="{{ hour }}"
+                            data-plant="{{ plant.id }}">
+                      {% for percent in range(0, 101) %}
+                        <option value="{{percent}}">{{percent}}%</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+            <button type="button" class="btn btn-success save-schedule" data-plant="{{ plant.id }}">Запиши</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endblock %}

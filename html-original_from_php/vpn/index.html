@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WireGuard Configuration & QR Code Generator (By Veselin Vasilev | SMARTSYS-BG.COM)</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .qr-container {
+            border: 1px solid #ddd;
+            padding: 40px;
+            margin-left: 20px;
+            display: inline-block;
+            text-align: center;
+            max-width: 400px;
+            position: relative;
+        }
+        .brand-label {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 16px;
+            color: #333;
+        }
+        #qrcode {
+            margin-top: 15px;
+            width: 300px;
+            height: 300px;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">WireGuard Configuration & QR Code Generator</h1>
+        <div class="form-container">
+            <div style="flex: 2;">
+                <form id="configForm">
+                    <!-- Private and Public Keys -->
+                    <div class="form-group">
+                        <label for="privateKey">Private Key</label>
+                        <input type="text" class="form-control" id="privateKey" placeholder="Automatically generated" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="publicKey">Public Key</label>
+                        <input type="text" class="form-control" id="publicKey" placeholder="Automatically generated" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="manualPublicKey">Manual Public Key (for Mikrotik)</label>
+                        <input type="text" class="form-control" id="manualPublicKey" placeholder="Enter manual public key">
+                    </div>
+                    <!-- WireGuard Configuration Inputs -->
+                    <div class="form-group">
+                        <label for="interfaceAddress">Interface Address</label>
+                        <input type="text" class="form-control" id="interfaceAddress" placeholder="10.10.10.2/32" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dnsServer">DNS Server</label>
+                        <input type="text" class="form-control" id="dnsServer" placeholder="192.168.1.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="allowedIPs">Allowed IPs</label>
+                        <input type="text" class="form-control" id="allowedIPs" placeholder="0.0.0.0/0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endpoint">Endpoint</label>
+                        <input type="text" class="form-control" id="endpoint" placeholder="8.8.8.8:51820" required>
+                    </div>
+                    <!-- Buttons to Trigger Actions -->
+                    <button type="button" class="btn btn-primary btn-block" id="generateKeys">Generate Keys</button>
+                    <button type="button" class="btn btn-primary btn-block" id="generateConfig">Generate Configuration</button>
+                </form>
+
+                <!-- Display Area for Generated Configuration -->
+                <div id="result">
+                    <h3 class="text-center">Configuration</h3>
+                    <pre id="configOutput" class="p-3 border"></pre>
+                </div>
+            </div>
+
+            <!-- QR Code Display Container -->
+            <div class="qr-container">
+                <h4>QR Code</h4>
+                <div id="qrcode"></div>
+                <button class="btn btn-secondary mt-3" id="generateQr">Generate QR Code</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('generateKeys').addEventListener('click', function () {
+            fetch('generate_keys.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(`Error: ${data.error}`);
+                    } else {
+                        document.getElementById('privateKey').value = data.privateKey;
+                        document.getElementById('publicKey').value = data.publicKey;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to connect to the server to generate keys. Please check the server configuration.');
+                });
+        });
+
+        document.getElementById('manualPublicKey').addEventListener('input', function () {
+            const manualKey = document.getElementById('manualPublicKey').value.trim();
+            document.getElementById('publicKey').disabled = manualKey.length > 0;
+        });
+
+        document.getElementById('generateConfig').addEventListener('click', function () {
+            const privateKey = document.getElementById('privateKey').value;
+            const interfaceAddress = document.getElementById('interfaceAddress').value;
+            const dnsServer = document.getElementById('dnsServer').value;
+            const allowedIPs = document.getElementById('allowedIPs').value;
+            const endpoint = document.getElementById('endpoint').value;
+
+            // Use manual public key if provided, otherwise use the generated one
+            const manualPublicKey = document.getElementById('manualPublicKey').value.trim();
+            const publicKey = manualPublicKey.length > 0 ? manualPublicKey : document.getElementById('publicKey').value;
+
+            const config = `[Interface]\nPrivateKey = ${privateKey}\nAddress = ${interfaceAddress}\nDNS = ${dnsServer}\n\n[Peer]\nPublicKey = ${publicKey}\nAllowedIPs = ${allowedIPs}\nEndpoint = ${endpoint}`;
+            document.getElementById('configOutput').textContent = config;
+        });
+
+        document.getElementById('generateQr').addEventListener('click', function () {
+            const config = document.getElementById('configOutput').textContent;
+            if (!config.trim()) {
+                alert('Please generate a configuration first.');
+                return;
+            }
+            const qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = '';
+            new QRCode(qrcodeContainer, {
+                text: config,
+                width: 300,
+                height: 300
+            });
+        });
+    </script>
+</body>
+</html>
+
