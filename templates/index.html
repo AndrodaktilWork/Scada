@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="row">
-  <h1 class="mb-4">Dashboard</h1>
+  <h1 class="mb-4">Управление</h1>
 </div>
 <div class="row">
   {% for client in clients %}
@@ -51,7 +51,6 @@
       </div>
     </div>
   </div>
-
   <!-- MODAL -->
   <div class="modal fade" id="scheduleModal-{{ client.id }}" tabindex="-1">
     <div class="modal-dialog modal-xl">
@@ -164,6 +163,17 @@
           <button type="button" class="btn btn-success save-schedule" data-client="{{ client.id }}">Запиши</button>
         </div>
       </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12">
+    <div class="text-center py-5">
+      <i class="fas fa-users fa-3x text-muted mb-3"></i>
+      <h4 class="text-muted">Няма регистрирани клиенти</h4>
+      <p class="text-muted">Добавете първия клиент, за да започнете.</p>
+      <a href="{{ url_for('add_client') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Добави клиент
+      </a>
     </div>
   </div>
   {% endfor %}

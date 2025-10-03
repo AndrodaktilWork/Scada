@@ -1,0 +1,71 @@
+body {
+    background-image: url('../assets/images/Background.png');
+    background-size: cover;  
+    background-position: center;
+    background-repeat: no-repeat; 
+    height: 100vh;
+  }
+  .form-check-input:checked {
+    background-color: #ffa43c; /* Желаем цвят за фона */
+    border-color: #ffa43c;     /* И цвят за бордера */
+  }
+  
+  /* Ако искаш да промениш ефекта при фокусиране */
+  .form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 87, 51, 0.5);
+  }
+  .link{
+    text-decoration: none;
+    color: #1a1a3d;
+  }
+  .btn{
+    background-color: #1a1a3d;
+    color: #ffa43c;
+  }
+  .btn:hover{
+    background-color: #323263;
+  }
+  .inside{
+
+    color: #fff;
+    margin: 0;
+    padding: 0;
+  }
+  .navbar-brand {
+    font-weight: 700;
+  }
+  .form-container {
+    background-color: #fff;
+    margin: auto;
+    color: #000;
+    border-radius: 15px;
+    padding: 2rem;
+    width: 450px;
+    height: 450px;
+  }
+  .ecology{
+    margin-left: 25%;
+  }
+  .footer-rights-text{
+    color: #1a1a3d;
+  }
+  .footer-icons a {
+    color: #1a1a3d;
+    margin: 0 0.5rem;
+    text-decoration: none;
+    font-size: 1.7rem;
+  }
+
+  .footer-links{
+    margin-left: 38%;
+  }
+
+  .footer-links a {
+    color: #fff;
+    margin: 0 0.5rem;
+    text-decoration: none;
+  }
+
+  .form-check.form-switch .form-check-input {
+    cursor: pointer;
+  }

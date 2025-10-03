@@ -155,7 +155,7 @@ function generateCalendar(clientId, year, month) {
     });
   });
 
-  let clientToDelete = null;
+let clientToDelete = null;
 
 function deleteClient(clientId, clientName) {
   clientToDelete = clientId;
@@ -189,3 +189,4 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
     deleteModal.hide();
   }
 });
+

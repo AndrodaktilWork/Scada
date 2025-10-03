@@ -40,6 +40,11 @@ class Invertor(db.Model):
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=True)
     email = db.Column(db.String(100), nullable=True)
+    phone = db.Column(db.String(100), nullable=True)
     password = db.Column(db.String(100), default=False)
     username = db.Column(db.String(1000), default=False)
+    scada = db.Column(db.Boolean, default=False)
+    camras = db.Column(db.Boolean, default=False)
+    control = db.Column(db.Boolean, default=False)

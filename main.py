@@ -22,7 +22,7 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.get_or_404(User, user_id)
+    return db.session.get(User, int(user_id))
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -35,7 +35,7 @@ def login():
             flash("That username does not exist, please try again.")
             return redirect(url_for('login'))
 
-        elif not check_password_hash(user.password, password):
+        if not check_password_hash(user.password, password):
             flash('Password incorrect, please try again.')
             return redirect(url_for('login'))
         
@@ -49,6 +49,60 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/users', methods=["GET"])
+def users():
+    users = User.query.all()
+    return render_template("users.html", users=users) 
+
+@app.route('/users/add', methods=["GET", "POST"])
+def add_user():
+    if request.method == "POST":
+        try:
+            scada = True if request.form.get('scada') else False
+            control = True if request.form.get('control') else False
+            camras = True if request.form.get('camras') else False
+            hash_and_salted_password = generate_password_hash(
+                request.form.get('password'),
+                method='pbkdf2:sha256',
+                salt_length=8
+            )
+            new_user = User(
+                name=request.form.get('name'),
+                email=request.form.get('email'),
+                phone=request.form.get('phone'),
+                username=request.form.get('username'),
+                password=hash_and_salted_password,
+                scada=scada,
+                control=control,
+                camras=camras
+            )
+
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash('Потребителят е добавен успешно!', 'success')
+            return redirect(url_for('users'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash('Грешка при добавяне на потребител!', 'danger')
+            print(f"Error: {e}")
+
+    return render_template("add_user.html")
+
+@app.route('/users/<int:user_id>/delete', methods=["POST"])
+def delete_user(user_id):
+    try:
+        user = User.query.get_or_404(user_id)
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Потребителят е изтрит успешно!"})
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting user: {e}")  # за да видиш грешката в конзолата
+        return jsonify({"success": False, "message": "Грешка при изтриване на потребител!"})
+
 
 @app.route('/')
 @login_required

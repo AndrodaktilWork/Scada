@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Clients - TechnoSun{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Потребители</h1>
+            <a href="{{ url_for('add_user') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Добави потребител
+            </a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="table-responsive small">
+        <table class="table table-striped table-sm">
+            <thead>
+                <th scope="col">Име</th>
+                <th scope="col">Имейл</th>
+                <th scope="col">Телефон</th>
+                <th scope="col">Потребителско име</th>
+                <th scope="col">Достъп скада</th>
+                <th scope="col">Достъп управление</th>
+                <th scope="col">Достъп наблюдение</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{user.name}}</td>
+                    <td>{{user.email}}</td>
+                    <td>{{user.phone}}</td>
+                    <td>{{user.username}}</td>
+                    <td><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
+                    <td><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
+                    <td><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
+                    <td> 
+                        <a href="{{ url_for('edit_client', client_id=user.id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Редактирай
+                        </a>
+                    <td>
+                        <button class="btn btn-outline-danger btn-sm" onclick="deleteUser({{ user.id }}, '{{ user.name }}')">
+                            <i class="fas fa-trash me-1"></i>Изтрий
+                        </button>
+                    </td>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Modal за изтриване на потребител -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Изтриване на потребител</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+      </div>
+      <div class="modal-body">
+        Сигурни ли сте, че искате да изтриете <strong id="userNameToDelete"></strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Откажи</button>
+        <button type="button" class="btn btn-danger" id="confirmUserDelete">Изтрий</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let userToDelete = null;
+
+    function deleteUser(userId, userName) {
+  userToDelete = userId;
+  document.getElementById('userNameToDelete').textContent = userName;
+  const deleteUserModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+  deleteUserModal.show();
+}
+
+document.getElementById('confirmUserDelete').addEventListener('click', function() {
+  if (userToDelete) {
+    fetch(`/users/${userToDelete}/delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Грешка: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Грешка при изтриване на потребител');
+    });
+
+    const deleteUserModal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
+    deleteUserModal.hide();
+  }
+});
+</script>
+{% endblock %}
