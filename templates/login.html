@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Login - TechnoSun{% endblock %}
+
+{% block content %}
+<div class="flex-grow-1 d-flex justify-content-center align-items-center p-0" >
+    <div class="row gx-0 w-100">
+        <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <img src="../static/assets/images/LogIn_Image.png" class="ecology img-fluid" alt="Solar panels and Earth illustration" width="90%">
+        </div>
+        <div class="col-md-6 mt-2 mt-md-0">
+            <div class="form-container">
+                <h2 class="mb-3 text-center">Sign In</h2>
+                <p class="text-center">Hello again dear User!</p>
+                <form action="{{ url_for('login') }}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input 
+                    type="text" 
+                    class="form-control" 
+                    id="username" 
+                    name="username"
+                    placeholder="Please enter your username">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input 
+                    type="password" 
+                    class="form-control" 
+                    id="password" 
+                    name="password"
+                    placeholder="Please enter your password">
+                </div>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for message in messages %}
+                        <p class="flash">{{ message }}</p>
+                    {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <button type="submit" class="btn btn-primary w-100 mt-1">Submit</button>
+                <div class="text-center mt-2 ">
+                    <a class="link" href="#">Forgotten password</a>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

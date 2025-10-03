@@ -37,3 +37,9 @@ class Invertor(db.Model):
     usage = db.Column(db.String(159), default=False)
     power_to_zero = db.Column(db.Integer, default=False)
     alarms = db.Column(db.String(159), default=False)
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), nullable=True)
+    password = db.Column(db.String(100), default=False)
+    username = db.Column(db.String(1000), default=False)

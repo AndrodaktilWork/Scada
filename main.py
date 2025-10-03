@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, url_for, redirect, flash, jso
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
-from models import db, Client, Schedule, Invertor
+from models import db, Client, Schedule, Invertor, User
 from datetime import datetime
 
 app = Flask(__name__)
@@ -15,7 +15,43 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 Bootstrap5(app)
 db.init_app(app)
 
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.get_or_404(User, user_id)
+
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get('username')
+        password = request.form.get('password')
+        result = db.session.execute(db.select(User).where(User.username == username))
+        user = result.scalar()
+        if not user:
+            flash("That username does not exist, please try again.")
+            return redirect(url_for('login'))
+
+        elif not check_password_hash(user.password, password):
+            flash('Password incorrect, please try again.')
+            return redirect(url_for('login'))
+        
+        else:
+            login_user(user)
+            return redirect(url_for('home'))
+
+    return render_template("login.html")
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route('/')
+@login_required
 def home():
     clients = Client.query.all()
     return render_template("index.html", clients=clients) 
