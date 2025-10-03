@@ -1,99 +1,208 @@
-{% extends "header.html" %}
+{% extends "base.html" %}
 
-{% block title %}Dashboard - HelioSync{% endblock %}
+{% block title %}Dashboard - TechnoSun{% endblock %}
 
 {% block content %}
 <div class="row">
   <h1 class="mb-4">Dashboard</h1>
 </div>
-  <div class="row">
-    {% for plant in plants %}
-    <div class="col-md-4 mb-4">
-      <div class="card shadow">
-        <div class="card-header bg-success text-white">
-          <h5 class="mb-0">{{ plant.name }}</h5>
-        </div>
-        <div class="card-body">
-          <p><strong>Представител:</strong> {{ plant.representative }}</p>
-          <p><strong>Производство:</strong> {{ plant.production_kw }} kW</p>
+<div class="row">
+  {% for client in clients %}
+  <div class="col-md-4 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-gradient-primary text-white">
+        <h5 class="mb-0">{{ client.name }}</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Представител:</strong> {{ client.representative }}</p>
+        <p><strong>Производство:</strong> {{ client.production_kw }} kW</p>
 
-          {% if plant.alarm %}
-            <div class="alert alert-danger">Има аларми!</div>
+        {% if client.alarm %}
+          <div class="alert alert-danger">Има аларми!</div>
+        {% else %}
+          <div class="alert alert-info">Няма аларми</div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-danger btn-sm">Ръчно Изключване</button>
+          <button class="btn btn-primary btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#scheduleModal-{{ client.id }}">
+            Създай График
+          </button>
+        </div>
+
+        <hr>
+        <p>
+          Прекъсвач:
+          {% if client.relay %}
+            <span class="badge bg-success">Включено</span>
           {% else %}
-            <div class="alert alert-info">Няма аларми</div>
+            <span class="badge bg-danger">Изключено</span>
           {% endif %}
+        </p>
 
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-danger btn-sm">Ръчно Изключване</button>
-            <button class="btn btn-primary btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#scheduleModal-{{ plant.id }}">
-              Създай График
-            </button>
-          </div>
+        <p>
+          Телемеханика (URNA):
+          <input type="checkbox" {% if client.telemechanics %}checked{% endif %}>
+        </p>
 
-          <hr>
-          <p>
-            Прекъсвач:
-            {% if plant.relay %}
-              <span class="badge bg-success">Включено</span>
-            {% else %}
-              <span class="badge bg-danger">Изключено</span>
-            {% endif %}
-          </p>
-
-          <p>
-            Телемеханика (URNA):
-            <input type="checkbox" {% if plant.telemechanics %}checked{% endif %}>
-          </p>
-
-          <a href="#" class="btn btn-link">Детайли</a>
-        </div>
+        <a href="#" class="btn btn-link">Детайли</a>
       </div>
     </div>
+  </div>
 
-    <!-- MODAL -->
-    <div class="modal fade" id="scheduleModal-{{ plant.id }}" tabindex="-1">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header bg-success text-white">
-            <h5 class="modal-title">Планиран контрол за {{ plant.name }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <!-- Дата -->
-              <div class="col-md-4 border-end">
-                <h6>Избери дата</h6>
-                <input type="date" id="date-{{ plant.id }}" class="form-control mb-3">
+  <!-- MODAL -->
+  <div class="modal fade" id="scheduleModal-{{ client.id }}" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Планиран контрол за {{ client.name }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <!-- Календар -->
+            <div class="col-md-6 border-end">
+              <h6 class="mb-3">Избери дата</h6>
+              
+              <!-- Навигация на месеца -->
+              <div class="calendar-navigation d-flex justify-content-between align-items-center mb-3">
+                <button class="btn btn-sm btn-outline-secondary prev-month" data-client="{{ client.id }}">← Предишен</button>
+                <h5 class="mb-0 current-month" data-client="{{ client.id }}">Октомври 2025</h5>
+                <button class="btn btn-sm btn-outline-secondary next-month" data-client="{{ client.id }}">Следващ →</button>
               </div>
-              <!-- Часове -->
-              <div class="col-md-8">
-                <h6>График по часове</h6>
+              
+              <!-- Календар -->
+              <div class="calendar-container mb-4">
+                <table class="table table-bordered text-center">
+                  <thead>
+                    <tr>
+                      <th>Пн</th>
+                      <th>Вт</th>
+                      <th>Ср</th>
+                      <th>Чт</th>
+                      <th>Пт</th>
+                      <th>Сб</th>
+                      <th>Нд</th>
+                    </tr>
+                  </thead>
+                  <tbody id="calendar-body-{{ client.id }}">
+                    <!-- Календарът ще се генерира динамично с JavaScript -->
+                  </tbody>
+                </table>
+                <div class="text-center text-muted small">
+                  Клик върху дата за избор и зареждане на почасовите стойности
+                </div>
+              </div>
+              
+              <!-- Активен график -->
+              <div class="active-schedule">
+                <h6 class="mb-3">Активен график</h6>
+                <div class="d-flex flex-column gap-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="scheduleTemplate-{{ client.id }}" id="template-all-0-{{ client.id }}">
+                    <label class="form-check-label" for="template-all-0-{{ client.id }}">
+                      Всички 0%
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="scheduleTemplate-{{ client.id }}" id="template-all-50-{{ client.id }}">
+                    <label class="form-check-label" for="template-all-50-{{ client.id }}">
+                      Всички 50%
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="scheduleTemplate-{{ client.id }}" id="template-all-100-{{ client.id }}">
+                    <label class="form-check-label" for="template-all-100-{{ client.id }}">
+                      Всички 100%
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="scheduleTemplate-{{ client.id }}" id="template-workday-{{ client.id }}" checked>
+                    <label class="form-check-label" for="template-workday-{{ client.id }}">
+                      Работен ден (8–18ч – 60%, друго 100%)
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Часове -->
+            <div class="col-md-6">
+              <h6 class="mb-3">График по часове</h6>
+              
+              <!-- Информация за текущ час -->
+              <div class="current-time-info mb-3 p-2 bg-light rounded">
+                <strong>Избрана дата: <span id="selected-date-{{ client.id }}">Не е избрана дата</span></strong>
+              </div>
+              
+              <!-- Почасови стойности -->
+              <div class="hourly-schedule">
                 <div class="row">
                   {% for hour in range(0, 24) %}
-                  <div class="col-3 mb-2">
-                    <label class="fw-bold">{{ "%02d:00"|format(hour) }}</label>
-                    <select class="form-select form-select-sm schedule-input"
-                            data-hour="{{ hour }}"
-                            data-plant="{{ plant.id }}">
-                      {% for percent in range(0, 101) %}
-                        <option value="{{percent}}">{{percent}}%</option>
-                      {% endfor %}
-                    </select>
+                  <div class="col-6 mb-2">
+                    <div class="d-flex align-items-center">
+                      <span class="fw-bold me-2" style="width: 50px;">{{ "%02d:00"|format(hour) }}</span>
+                      <select class="form-select form-select-sm schedule-input"
+                              data-hour="{{ hour }}"
+                              data-client="{{ client.id }}">
+                        {% for percent in range(0, 101) %}
+                          <option value="{{percent}}" {% if percent == 100 %}selected{% endif %}>{{percent}}%</option>
+                        {% endfor %}
+                      </select>
+                    </div>
                   </div>
                   {% endfor %}
                 </div>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
-            <button type="button" class="btn btn-success save-schedule" data-plant="{{ plant.id }}">Запиши</button>
-          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+          <button type="button" class="btn btn-success save-schedule" data-client="{{ client.id }}">Запиши</button>
         </div>
       </div>
     </div>
-    {% endfor %}
   </div>
-  {% endblock %}
+  {% endfor %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Инициализираме календарите за всяко растение
+    const today = new Date();
+    {% for client in clients %}
+      generateCalendar('{{ client.id }}', today.getFullYear(), today.getMonth());
+    {% endfor %}
+    
+    // Навигация между месеците
+    document.querySelectorAll('.prev-month, .next-month').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const clientId = this.getAttribute('data-client');
+        const currentMonthEl = document.querySelector(`.current-month[data-client="${clientId}"]`);
+        const currentText = currentMonthEl.textContent;
+        
+        const monthNames = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", 
+                          "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
+        
+        const currentMonthIndex = monthNames.findIndex(name => currentText.includes(name));
+        const currentYear = parseInt(currentText.split(' ')[1]);
+        
+        let newMonth, newYear;
+        
+        if (this.classList.contains('prev-month')) {
+          newMonth = currentMonthIndex === 0 ? 11 : currentMonthIndex - 1;
+          newYear = currentMonthIndex === 0 ? currentYear - 1 : currentYear;
+        } else {
+          newMonth = currentMonthIndex === 11 ? 0 : currentMonthIndex + 1;
+          newYear = currentMonthIndex === 11 ? currentYear + 1 : currentYear;
+        }
+        
+        generateCalendar(clientId, newYear, newMonth);
+      });
+    });
+});
+</script>
+{% endblock %}

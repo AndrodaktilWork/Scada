@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, url_for, redirect, flash, jso
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
+from models import db, Client, Schedule, Invertor
 from datetime import datetime
 
 app = Flask(__name__)
@@ -12,52 +13,161 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://scada_user:scada_
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 Bootstrap5(app)
-db = SQLAlchemy(app)
-
-class Plant(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    representative = db.Column(db.String(120), nullable=True)
-    production_kw = db.Column(db.Float, default=0.0)
-    alarm = db.Column(db.Boolean, default=False)
-    relay = db.Column(db.Boolean, default=False)
-    telemechanics = db.Column(db.Boolean, default=False)
-
-
-class Schedule(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    plant_id = db.Column(db.Integer, db.ForeignKey("plant.id"), nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    hour = db.Column(db.Integer, nullable=False)
-    value = db.Column(db.Integer, default=100)
-
-    plant = db.relationship("Plant", backref="schedules")
-
-with app.app_context():
-    db.create_all()
-
+db.init_app(app)
 
 @app.route('/')
 def home():
-    plants = Plant.query.all()
-    return render_template("index.html", plants=plants) 
+    clients = Client.query.all()
+    return render_template("index.html", clients=clients) 
 
 @app.route("/save_schedule", methods=["POST"])
 def save_schedule():
     data = request.json
-    plant_id = data.get("plant_id")
+    client_id = data.get("client_id")
     date_str = data.get("date")
     values = data.get("values")
 
     date = datetime.strptime(date_str, "%Y-%m-%d").date()
 
-    Schedule.query.filter_by(plant_id=plant_id, date=date).delete()
+    Schedule.query.filter_by(client_id=client_id, date=date).delete()
 
     for hour, val in values.items():
-        sched = Schedule(plant_id=plant_id, date=date, hour=int(hour), value=int(val))
+        sched = Schedule(client_id=client_id, date=date, hour=int(hour), value=int(val))
         db.session.add(sched)
 
     db.session.commit()
     return jsonify({"status": "success"})
 
-app.run(debug=True)
+@app.route('/clients', methods=["GET"])
+def clients():
+    clients = Client.query.all()
+    return render_template("clients.html", clients=clients) 
+
+@app.route('/clients/add', methods=["GET", "POST"])
+def add_client():
+    if request.method == "POST":
+        try:
+            new_client = Client(
+                name=request.form.get('name'),
+                representative=request.form.get('representative'),
+                production_kw=float(request.form.get('production_kw', 0)),
+                company=request.form.get('company'),
+                phone=request.form.get('phone'),
+                email=request.form.get('email'),
+                alarm=False,
+                relay=False,
+                telemechanics=False
+            )
+            db.session.add(new_client)
+            db.session.flush() 
+            
+            model = request.form.get('model')
+            if model: 
+                new_invertor = Invertor(
+                    client_id=new_client.id,
+                    model=model,
+                    client = request.form.get('name'),
+                    sn_number=request.form.get('sn_number'),
+                    representative=request.form.get('representative'),
+                    power=request.form.get('power'),
+                    oneP_threeP=request.form.get('oneP_threeP'),
+                    strings=request.form.get('strings'),
+                    panels=request.form.get('panels'),
+                    usage=request.form.get('usage'),
+                    power_to_zero=request.form.get('power_to_zero'),
+                    alarms=request.form.get('alarms')
+                )
+                db.session.add(new_invertor)
+            
+            db.session.commit()
+            flash('Клиентът и инверторът са добавени успешно!', 'success')
+            return redirect(url_for('clients'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('Грешка при добавяне на клиент!', 'danger')
+            print(f"Error: {e}")
+    
+    return render_template("add_client.html")
+
+@app.route('/clients/<int:client_id>/edit', methods=["GET", "POST"])
+def edit_client(client_id):
+    client = Client.query.get_or_404(client_id)
+    
+    invertor = client.invertors[0] if client.invertors else None
+    
+    if request.method == "POST":
+        try:
+            client.name = request.form.get('name')
+            client.representative = request.form.get('representative')
+            client.production_kw = float(request.form.get('production_kw', 0))
+            client.company = request.form.get('company')
+            client.phone = request.form.get('phone')
+            client.email = request.form.get('email')
+            
+            model = request.form.get('model')
+            if model:
+                if invertor:
+                    invertor.model = model
+                    invertor.client = request.form.get('name')
+                    invertor.sn_number = request.form.get('sn_number')
+                    invertor.representative = request.form.get('company')
+                    invertor.power = request.form.get('power')
+                    invertor.oneP_threeP = request.form.get('oneP_threeP')
+                    invertor.strings = request.form.get('strings')
+                    invertor.panels = request.form.get('panels')
+                    invertor.usage = request.form.get('usage')
+                    invertor.power_to_zero = request.form.get('power_to_zero')
+                    invertor.alarms = request.form.get('alarms')
+                else:
+                    new_invertor = Invertor(
+                        client_id=client.id,
+                        model=model,
+                        client = request.form.get('name'),
+                        sn_number=request.form.get('sn_number'),
+                        representative=request.form.get('invertor_representative'),
+                        power=request.form.get('power'),
+                        oneP_threeP=request.form.get('oneP_threeP'),
+                        strings=request.form.get('strings'),
+                        panels=request.form.get('panels'),
+                        usage=request.form.get('usage'),
+                        power_to_zero=request.form.get('power_to_zero'),
+                        alarms=request.form.get('alarms')
+                    )
+                    db.session.add(new_invertor)
+            
+            db.session.commit()
+            flash('Клиентът и инверторът са обновени успешно!', 'success')
+            return redirect(url_for('clients'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('Грешка при обновяване на клиент!', 'danger')
+            print(f"Error: {e}")
+    
+    return render_template("edit_client.html", client=client)
+
+@app.route('/clients/<int:client_id>/delete', methods=["POST"])
+def delete_client(client_id):
+    try:
+        client = Client.query.get_or_404(client_id)
+        
+        Schedule.query.filter_by(client_id=client_id).delete()
+        
+        db.session.delete(client)
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": "Клиентът е изтрит успешно!"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": "Грешка при изтриване на клиент!"})
+
+@app.route('/invertors', methods=["GET"])
+def invertors():
+    invertors = Invertor.query.all()
+    return render_template("invertors.html", invertors=invertors) 
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all() 
+    app.run(debug=True)

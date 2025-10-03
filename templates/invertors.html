@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Invertors - TechnoSun{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Invertors</h1>
+            <a href="{{ url_for('add_client') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Добави клиент
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="table-responsive small">
+        <table class="table table-striped table-sm">
+            <thead>
+                <th scope="col">Инвертор</th>
+                <th scope="col">SN Номер</th>
+                <th scope="col">Клиент</th>
+                <th scope="col">Централа</th>
+                <th scope="col">Мощност</th>
+                <th scope="col">1P / 3P</th>
+                <th scope="col">Стрингове</th>
+                <th scope="col">Брой панели</th>
+                <th scope="col">Тип употреба</th>
+                <th scope="col">Power To Zero</th>
+                <th scope="col">Аларми</th>
+            </thead>
+            <tbody>
+                {% for invertor in invertors %}
+                <tr>
+                    <td>{{invertor.model}}</td>
+                    <td>{{invertor.sn_number}}</td>
+                    <td>{{invertor.client}}</td>
+                    <td>{{invertor.representative}}</td>
+                    <td>{{invertor.power}}</td>
+                    <td>{{invertor.oneP_threeP}}</td>
+                    <td>{{invertor.strings}}</td>
+                    <td>{{invertor.panels}}</td>
+                    <td>{{invertor.power_to_zero}}</td>
+                    <td>{{invertor.usage}}</td>
+                    <td>{{invertor.alarms}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

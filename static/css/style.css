@@ -167,3 +167,45 @@ a.sidebar-link:hover {
     transition: all .2s ease-out;
 }
 
+.calendar-container table {
+  font-size: 0.9rem;
+}
+
+.calendar-container th, 
+.calendar-container td {
+  padding: 0.5rem;
+  width: 14.28%;
+}
+
+.calendar-container .calendar-day:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.calendar-container .text-muted {
+  color: #6c757d !important;
+}
+
+.calendar-container .today {
+  background-color: #d1ecf1 !important;
+  color: #0c5460;
+  font-weight: bold;
+}
+
+.calendar-container .selected {
+  background-color: #007bff !important;
+  color: white;
+  font-weight: bold;
+}
+
+.active-schedule .form-check {
+  margin-bottom: 0.5rem;
+}
+
+.hourly-schedule .form-select {
+  width: 80px;
+}
+
+.current-time-info {
+  font-size: 0.9rem;
+}

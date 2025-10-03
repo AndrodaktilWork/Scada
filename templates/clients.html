@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Clients - TechnoSun{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Clients</h1>
+            <a href="{{ url_for('add_client') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Добави клиент
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+  {% for client in clients %}
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card client-card shadow-sm border-0 h-100">
+      <div class="card-header bg-gradient-primary text-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0 fw-bold">{{ client.name }}</h5>
+        </div>
+      </div>
+      
+      <div class="card-body">
+         <div class="mb-3">
+          <h6 class="border-bottom pb-2 mb-2">Основна информация</h6>
+          <div class="row g-2">
+            <div class="col-12">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-user me-2 text-primary"></i>
+                <span class="fw-medium">Представител:</span>
+                <span class="ms-2">{{ client.representative or 'Не е посочен' }}</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-building me-2 text-primary"></i>
+                <span class="fw-medium">Компания:</span>
+                <span class="ms-2">{{ client.company or 'Не е посочена' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <h6 class="border-bottom pb-2 mb-2">Контакти</h6>
+          <div class="row g-2">
+            {% if client.phone %}
+            <div class="col-12">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-phone me-2 text-success"></i>
+                <span>{{ client.phone }}</span>
+              </div>
+            </div>
+            {% endif %}
+            {% if client.email %}
+            <div class="col-12">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-envelope me-2 text-success"></i>
+                <span class="text-truncate">{{ client.email }}</span>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-footer bg-transparent border-top-0 pt-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="{{ url_for('edit_client', client_id=client.id) }}" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-edit me-1"></i>Редактирай
+          </a>
+          <button class="btn btn-outline-danger btn-sm" onclick="deleteClient({{ client.id }}, '{{ client.name }}')">
+            <i class="fas fa-trash me-1"></i>Изтрий
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12">
+    <div class="text-center py-5">
+      <i class="fas fa-users fa-3x text-muted mb-3"></i>
+      <h4 class="text-muted">Няма регистрирани клиенти</h4>
+      <p class="text-muted">Добавете първия клиент, за да започнете.</p>
+      <a href="{{ url_for('add_client') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Добави клиент
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Потвърждение за изтриване</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Сигурни ли сте, че искате да изтриете клиента: <strong id="clientNameToDelete"></strong>?</p>
+        <p class="text-danger"><small>Това действие не може да бъде отменено.</small></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Откажи</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">Изтрий</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

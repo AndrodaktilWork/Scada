@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Добави клиент - TechnoSun{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Добави нов клиент</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <!-- Основна информация за клиента -->
+                    <h5 class="mb-3 border-bottom pb-2">Основна информация</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Име на клиент *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="representative" class="form-label">Представител</label>
+                            <input type="text" class="form-control" id="representative" name="representative">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="company" class="form-label">Компания</label>
+                            <input type="text" class="form-control" id="company" name="company">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Телефон</label>
+                            <input type="tel" class="form-control" id="phone" name="phone">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                    </div>
+
+                    <!-- Информация за инвертора -->
+                    <h5 class="mb-3 border-bottom pb-2 mt-4">Информация за инвертора</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="model" class="form-label">Модел на инвертора</label>
+                            <input type="text" class="form-control" id="model" name="model">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sn_number" class="form-label">Сериен номер</label>
+                            <input type="text" class="form-control" id="sn_number" name="sn_number">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="power" class="form-label">Мощност (kW)</label>
+                            <input type="number" class="form-control" id="power" name="power" placeholder="kW">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="oneP_threeP" class="form-label">Тип инвертор</label>
+                            <select class="form-select" id="oneP_threeP" name="oneP_threeP">
+                                <option value="" selected>Изберете тип</option>
+                                <option value="1P">1-фазен (1P)</option>
+                                <option value="3P">3-фазен (3P)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="strings" class="form-label">Брой стрингове</label>
+                            <input type="number" class="form-control" id="strings" name="strings">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="panels" class="form-label">Брой панели</label>
+                            <input type="number" class="form-control" id="panels" name="panels">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="usage" class="form-label">Натоварване</label>
+                            <select class="form-select" id="usage" name="usage">
+                                <option value="" selected>Изберете натоварване</option>
+                                <option value="Домакинство">Домакинство</option>
+                                <option value="Търговски">Търговски</option>
+                                <option value="Промишлен">Промишлен</option>
+                                <option value="Селскостопански">Селскостопански</option>
+                                <option value="Друг">Друг</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="power_to_zero" class="form-label">Мощност до нула (%)</label>
+                            <input type="number" class="form-control" id="power_to_zero" name="power_to_zero" min="0" max="100" placeholder="%">
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Добави клиент
+                        </button>
+                        <a href="{{ url_for('clients') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>Откажи
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

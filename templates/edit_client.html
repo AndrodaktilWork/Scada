@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Редактирай клиент - TechnoSun{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-white">
+                <h4 class="mb-0">Редактирай клиент</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <!-- Основна информация за клиента -->
+                    <h5 class="mb-3 border-bottom pb-2">Основна информация</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Име на клиент *</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ client.name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="representative" class="form-label">Представител</label>
+                            <input type="text" class="form-control" id="representative" name="representative" value="{{ client.representative or '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="company" class="form-label">Компания</label>
+                            <input type="text" class="form-control" id="company" name="company" value="{{ client.company or '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Телефон</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ client.phone or '' }}">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ client.email or '' }}">
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3 border-bottom pb-2 mt-4">Информация за инвертора</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="model" class="form-label">Модел на инвертора</label>
+                            <input type="text" class="form-control" id="model" name="model" value="{{ client.invertors[0].model if client.invertors else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sn_number" class="form-label">Сериен номер</label>
+                            <input type="text" class="form-control" id="sn_number" name="sn_number" value="{{ client.invertors[0].sn_number if client.invertors else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="power" class="form-label">Мощност (kW)</label>
+                            <input type="number" class="form-control" id="power" name="power" value="{{ client.invertors[0].power if client.invertors else '' }}" placeholder="kW">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="oneP_threeP" class="form-label">Тип инвертор</label>
+                            <select class="form-select" id="oneP_threeP" name="oneP_threeP">
+                                <option value="" {{ 'selected' if not client.invertors or not client.invertors[0].oneP_threeP else '' }}>Изберете тип</option>
+                                <option value="1P" {{ 'selected' if client.invertors and client.invertors[0].oneP_threeP == '1P' else '' }}>1-фазен (1P)</option>
+                                <option value="3P" {{ 'selected' if client.invertors and client.invertors[0].oneP_threeP == '3P' else '' }}>3-фазен (3P)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="strings" class="form-label">Брой стрингове</label>
+                            <input type="number" class="form-control" id="strings" name="strings" value="{{ client.invertors[0].strings if client.invertors else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="panels" class="form-label">Брой панели</label>
+                            <input type="number" class="form-control" id="panels" name="panels" value="{{ client.invertors[0].panels if client.invertors else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="usage" class="form-label">Натоварване</label>
+                            <select class="form-select" id="usage" name="usage">
+                                <option value="" {{ 'selected' if not client.invertors or not client.invertors[0].usage else '' }}>Изберете натоварване</option>
+                                <option value="Домакинство" {{ 'selected' if client.invertors and client.invertors[0].usage == 'Домакинство' else '' }}>Домакинство</option>
+                                <option value="Търговски" {{ 'selected' if client.invertors and client.invertors[0].usage == 'Търговски' else '' }}>Търговски</option>
+                                <option value="Промишлен" {{ 'selected' if client.invertors and client.invertors[0].usage == 'Промишлен' else '' }}>Промишлен</option>
+                                <option value="Селскостопански" {{ 'selected' if client.invertors and client.invertors[0].usage == 'Селскостопански' else '' }}>Селскостопански</option>
+                                <option value="Друг" {{ 'selected' if client.invertors and client.invertors[0].usage == 'Друг' else '' }}>Друг</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="power_to_zero" class="form-label">Мощност до нула (%)</label>
+                            <input type="number" class="form-control" id="power_to_zero" name="power_to_zero" min="0" max="100" value="{{ client.invertors[0].power_to_zero if client.invertors else '' }}" placeholder="%">
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-1"></i>Запази промените
+                        </button>
+                        <a href="{{ url_for('clients') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>Откажи
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
