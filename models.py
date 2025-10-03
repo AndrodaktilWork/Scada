@@ -11,9 +11,9 @@ class Client(db.Model):
     alarm = db.Column(db.Boolean, default=False)
     relay = db.Column(db.Boolean, default=False)
     telemechanics = db.Column(db.Boolean, default=False)
-    phone = db.Column(db.String(159), default=False)
-    email = db.Column(db.String(159), default=False)
-    company = db.Column(db.String(159), default=False)
+    phone = db.Column(db.String(159), default="")
+    email = db.Column(db.String(159), default="")
+    company = db.Column(db.String(159), default="")
 
 class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -25,18 +25,19 @@ class Schedule(db.Model):
 
 class Invertor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    model = db.Column(db.String(159), default=False)
+    model = db.Column(db.String(159), default="")
+    client_name = db.Column(db.String(150), default="")
     client_id = db.Column(db.Integer, db.ForeignKey("client.id"), nullable=False)
-    sn_number = db.Column(db.String(159), default=False)
+    sn_number = db.Column(db.String(159), default="")
     client = db.relationship("Client", backref="invertors")
     representative = db.Column(db.String(120), nullable=True)
-    power = db.Column(db.Integer, default=False)
-    oneP_threeP = db.Column(db.String(159), default=False)
-    strings = db.Column(db.Integer, default=False)
-    panels = db.Column(db.Integer, default=False)
-    usage = db.Column(db.String(159), default=False)
-    power_to_zero = db.Column(db.Integer, default=False)
-    alarms = db.Column(db.String(159), default=False)
+    power = db.Column(db.Integer, default=0)
+    oneP_threeP = db.Column(db.String(159), default="")
+    strings = db.Column(db.Integer, default=0)
+    panels = db.Column(db.Integer, default=0)
+    usage = db.Column(db.String(159), default="")
+    power_to_zero = db.Column(db.Integer, default=0)
+    alarms = db.Column(db.String(159), default="")
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)

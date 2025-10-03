@@ -152,13 +152,13 @@ def add_client():
             db.session.flush() 
             
             model = request.form.get('model')
-            if model: 
+            if model:
                 new_invertor = Invertor(
                     client_id=new_client.id,
                     model=model,
-                    client = request.form.get('name'),
+                    client_name=request.form.get('representative'),
                     sn_number=request.form.get('sn_number'),
-                    representative=request.form.get('representative'),
+                    representative=request.form.get('name'),
                     power=request.form.get('power'),
                     oneP_threeP=request.form.get('oneP_threeP'),
                     strings=request.form.get('strings'),
@@ -199,9 +199,9 @@ def edit_client(client_id):
             if model:
                 if invertor:
                     invertor.model = model
-                    invertor.client = request.form.get('name')
+                    invertor.client_name = request.form.get('representative')
                     invertor.sn_number = request.form.get('sn_number')
-                    invertor.representative = request.form.get('company')
+                    invertor.representative = request.form.get('name')
                     invertor.power = request.form.get('power')
                     invertor.oneP_threeP = request.form.get('oneP_threeP')
                     invertor.strings = request.form.get('strings')
@@ -213,9 +213,9 @@ def edit_client(client_id):
                     new_invertor = Invertor(
                         client_id=client.id,
                         model=model,
-                        client = request.form.get('name'),
+                        client_name=request.form.get('representative'),
                         sn_number=request.form.get('sn_number'),
-                        representative=request.form.get('invertor_representative'),
+                        representative=request.form.get('name'),
                         power=request.form.get('power'),
                         oneP_threeP=request.form.get('oneP_threeP'),
                         strings=request.form.get('strings'),
@@ -241,12 +241,12 @@ def edit_client(client_id):
 def delete_client(client_id):
     try:
         client = Client.query.get_or_404(client_id)
-        
+        # Delete all invertors for this client
+        Invertor.query.filter_by(client_id=client_id).delete()
+        # Delete all schedules for this client
         Schedule.query.filter_by(client_id=client_id).delete()
-        
         db.session.delete(client)
         db.session.commit()
-        
         return jsonify({"success": True, "message": "Клиентът е изтрит успешно!"})
     except Exception as e:
         db.session.rollback()
@@ -259,5 +259,5 @@ def invertors():
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all() 
-    app.run(debug=True)
+        db.create_all()
+    app.run(debug=True, host='0.0.0.0', port=5000)
