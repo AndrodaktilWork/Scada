@@ -1,5 +1,6 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, make_response
+from flask_login import login_required
 from models import db, Client, Schedule, Invertor, User
 from connect_modbus import SMARTLOGGER_CONFIG, read_modbus_value
 from pyModbusTCP.client import ModbusClient
@@ -72,6 +73,7 @@ def api_inverters():
     return response
 
 @clients_bp.route('/client_details/<int:invertor_id>', methods=["GET"])
+@login_required
 def client_details(invertor_id):
     invertors = Invertor.query.all()
     idx = None
@@ -85,11 +87,13 @@ def client_details(invertor_id):
     return render_template("client_details.html", invertor=invertor_obj, data=data)
 
 @clients_bp.route('/clients', methods=["GET"])
+@login_required
 def clients():
     clients = Client.query.all()
     return render_template("clients.html", clients=clients) 
 
 @clients_bp.route('/clients/add', methods=["GET", "POST"])
+@login_required
 def add_client():
     if request.method == "POST":
         try:
@@ -142,6 +146,7 @@ def add_client():
     return render_template("add_client.html")
 
 @clients_bp.route('/clients/<int:client_id>/edit', methods=["GET", "POST"])
+@login_required
 def edit_client(client_id):
     client = Client.query.get_or_404(client_id)
     
@@ -207,6 +212,7 @@ def edit_client(client_id):
     return render_template("edit_client.html", client=client)
 
 @clients_bp.route('/clients/<int:client_id>/delete', methods=["POST"])
+@login_required
 def delete_client(client_id):
     try:
         client = Client.query.get_or_404(client_id)

@@ -59,6 +59,7 @@ def home():
     return render_template("dashboard.html", clients=clients) 
 
 @app.route("/save_schedule", methods=["POST"])
+@login_required
 def save_schedule():
     data = request.json
     client_id = data.get("client_id")
@@ -77,6 +78,7 @@ def save_schedule():
     return jsonify({"status": "success"})
 
 @app.route('/invertors', methods=["GET"])
+@login_required
 def invertors():
     invertors = Invertor.query.all()
     return render_template("invertors.html", invertors=invertors) 
