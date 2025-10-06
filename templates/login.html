@@ -1,61 +1,75 @@
-
-{% include "login_header.html" %}
-
-<div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh;">
-  <div class="row w-100 justify-content-center">
-    <div class="col-md-6 d-flex flex-column align-items-center justify-content-center">
-      <div class="footer-icons mb-3">
-        <a href="#"><i class="bi bi-instagram"></i></a>
-        <a href="#"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-facebook"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
-        <a href="#"><i class="bi bi-envelope-fill"></i></a>
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login_style.css') }}">
+  <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="left">
+    <img src="https://images.unsplash.com/flagged/photo-1566838616631-f2618f74a6a2?ixlib=rb-4.1.0&auto=format&fit=crop&w=1080&q=80" alt="Solar Panels">
+    <div class="overlay"></div>
+    <div class="content">
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+        <div style="background:var(--secondary);border-radius:10px;width: 70px;height:70px;display:flex;align-items:center;justify-content:center;">
+           <i class="lni lni-sun icon_name" ></i>
+        </div>
+        <h2 class="company_name">Technosun</h2>
       </div>
-      <img src="../static/assets/images/LogIn_Image.png" class="ecology img-fluid" alt="Solar panels and Earth illustration" width="90%">
-    </div>
-    <div class="col-md-6 mt-2 mt-md-0 d-flex flex-column align-items-center justify-content-center">
-      <div class="form-container">
-        <h2 class="mb-3 text-center">Sign In</h2>
-        <p class="text-center">Hello again dear User!</p>
-        <form action="{{ url_for('login') }}" method="post">
-          <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="username" 
-              name="username"
-              placeholder="Please enter your username">
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input 
-              type="password" 
-              class="form-control" 
-              id="password" 
-              name="password"
-              placeholder="Please enter your password">
-          </div>
-          {% with messages = get_flashed_messages() %}
-            {% if messages %}
-              {% for message in messages %}
-                <p class="flash">{{ message }}</p>
-              {% endfor %}
-            {% endif %}
-          {% endwith %}
-          <button type="submit" class="btn btn-primary w-100 mt-1">Submit</button>
-          <div class="text-center mt-2 ">
-            <a class="link" href="#">Forgotten password</a>
-          </div>
-        </form>
-      </div>
-      <div class="footer-links mt-4">
-        <a href="{{url_for('login')}}">Contacts</a>
-        <a href="{{url_for('login')}}">More about us</a>
-        <a href="{{url_for('login')}}">Other platforms</a>
+      <h2>IT мениджмънт и управление на ВЕИ инфраструктури</h2>
+      <p>Мониторинг в реално време, аналитика и оптимизация на вашата соларна енергийна система</p>
+      <div class="stats">
+        <div>
+          <div class="value">99.9%</div>
+          <div>Uptime</div>
+        </div>
+        <div>
+          <div class="value">24/7</div>
+          <div>Поддръжка</div>
+        </div>
+        <div>
+          <div class="value">500+</div>
+          <div>Централи</div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-{% include "login_footer.html" %}
+  <div class="right pattern-bg">
+    <div class="card">
+      <h2>Добре дошли обратно</h2>
+      <p>Влезте в профила си за достъп до системата</p>
+      <form action="{{ url_for('login') }}" method="post">
+        <label for="username">Потребителско име</label>
+        <div class="input-group">
+          <i class="lni lni-user"></i>
+          <input type="text" id="username" name="username" placeholder="admin" required>
+        </div>
+
+        <label for="password">Парола</label>
+        <div class="input-group">
+          <i class="lni lni-lock"></i>
+          <input type="password" id="password" name="password" placeholder="••••••••" required>
+        </div>
+
+        <div class="checkbox">
+          <input type="checkbox" id="remember">
+          <label for="remember">Запомни ме</label>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <p class="flash">{{ message }}</p>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <button type="submit" class="btn-primary">Вход</button>
+      </form>
+
+      <div class="footer">
+        Нямате профил? <a href="https://technosun.bg/contactus">Свържете се с нас</a>
+      </div>
+
+      <div class="footer">© 2025 TechnoSun. Всички права запазени.</div>
+    </div>
+  </div>
+</body>

@@ -9,7 +9,7 @@
 
 .card-header{
     color: white;
-    background-color: #1a1a3d;
+    background-color: #FF9C00;
 }
 
 a {
@@ -45,9 +45,9 @@ body {
 
 .pattern-bg {
     background-image: url('../assets/images/pattern.png') !important;
-    background-repeat: repeat;       
+    background-repeat: no-repeat;       
     background-position: center;    
-    background-size: auto;       
+    background-size: cover;       
 }
 
 #sidebar {
@@ -55,7 +55,7 @@ body {
     min-width: 70px;
     z-index: 1000;
     transition: all .25s ease-in-out;
-    background-color: #1a1a3d;
+    background-color: #FF9C00;
     display: flex;
     flex-direction: column;
 }
@@ -208,4 +208,9 @@ a.sidebar-link:hover {
 
 .current-time-info {
   font-size: 0.9rem;
+}
+
+.button_accept{
+    color: white;
+    background-color:#FF9C00
 }

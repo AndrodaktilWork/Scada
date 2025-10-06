@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Inverter Dashboard - TechnoSun{% endblock %}
+
+{% block content %}
+<div class="row">
+  <h1 class="mb-4">Мониторинг на инвертори</h1>
+</div>
+
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <div class="card shadow">
+      <div class="card-header text-white">
+        <h4 class="mb-0">Инвертор: {{ invertor.model }} (ID: {{ invertor.id }})</h4>
+      </div>
+      <div class="card-body">
+        <ul class="list-group mb-3" id="inverter-data">
+        {% for key, value in data.items() %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ key }}</span>
+            <span>{{ value }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateCard() {
+  fetch('/api/inverters')
+    .then(r => r.json())
+    .then(data => {
+      const invertorId = {{ invertor.id }};
+      const card = document.getElementById('inverter-data');
+      if (data[invertorId]) {
+        let html = '';
+        for (const [key, value] of Object.entries(data[invertorId])) {
+          html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>${key}</span>
+            <span>${value}</span>
+          </li>`;
+        }
+        card.innerHTML = html;
+      }
+    });
+}
+
+setInterval(updateCard, 5000);
+updateCard();
+</script>
+{% endblock %}

@@ -7,7 +7,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="mb-0">Потребители</h1>
-            <a href="{{ url_for('add_user') }}" class="btn btn-primary">
+            <a href="{{ url_for('users.add_user') }}" class="btn btn-primary">
                 <i class="fas fa-plus me-1"></i>Добави потребител
             </a>
         </div>
@@ -34,17 +34,19 @@
                     <td>{{user.email}}</td>
                     <td>{{user.phone}}</td>
                     <td>{{user.username}}</td>
-                    <td><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
-                    <td><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
-                    <td><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
+                    <td><input type="checkbox" disabled {% if user.scada %}checked{% endif %}></td>
+                    <td><input type="checkbox" disabled {% if user.control %}checked{% endif %}></td>
+                    <td><input type="checkbox" disabled {% if user.camras %}checked{% endif %}></td>
                     <td> 
-                        <a href="{{ url_for('edit_client', client_id=user.id) }}" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-edit me-1"></i>Редактирай
                         </a>
-                    <td>
+                    {%if user.username != "admin"%}
+                        <td>
                         <button class="btn btn-outline-danger btn-sm" onclick="deleteUser({{ user.id }}, '{{ user.name }}')">
                             <i class="fas fa-trash me-1"></i>Изтрий
                         </button>
+                    {%endif%}
                     </td>
                 {% endfor %}
             </tbody>

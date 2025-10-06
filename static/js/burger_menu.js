@@ -154,39 +154,3 @@ function generateCalendar(clientId, year, month) {
       });
     });
   });
-
-let clientToDelete = null;
-
-function deleteClient(clientId, clientName) {
-  clientToDelete = clientId;
-  document.getElementById('clientNameToDelete').textContent = clientName;
-  const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-  deleteModal.show();
-}
-
-document.getElementById('confirmDelete').addEventListener('click', function() {
-  if (clientToDelete) {
-    fetch(`/clients/${clientToDelete}/delete`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert('Грешка при изтриване на клиента: ' + data.message);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Грешка при изтриване на клиента');
-    });
-    
-    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-    deleteModal.hide();
-  }
-});
-

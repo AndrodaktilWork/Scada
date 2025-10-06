@@ -7,7 +7,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="mb-0">Клиенти</h1>
-            <a href="{{ url_for('add_client') }}" class="btn btn-primary">
+            <a href="{{ url_for('clients.add_client') }}" class="btn btn-primary">
                 <i class="fas fa-plus me-1"></i>Добави клиент
             </a>
         </div>
@@ -17,7 +17,7 @@
 <div class="row">
   {% for client in clients %}
   <div class="col-md-6 col-lg-4 mb-4">
-    <div class="card client-card shadow-sm border-0 h-100">
+    <div class="card client-card shadow border-0 h-100">
       <div class="card-header bg-gradient-primary text-white py-3">
         <div class="d-flex justify-content-between align-items-center">
           <h5 class="card-title mb-0 fw-bold">{{ client.name }}</h5>
@@ -69,7 +69,7 @@
       
       <div class="card-footer bg-transparent border-top-0 pt-0">
         <div class="d-flex justify-content-between align-items-center">
-          <a href="{{ url_for('edit_client', client_id=client.id) }}" class="btn btn-outline-primary btn-sm">
+          <a href="{{ url_for('clients.edit_client', client_id=client.id) }}" class="btn btn-outline-primary btn-sm">
             <i class="fas fa-edit me-1"></i>Редактирай
           </a>
           <button class="btn btn-outline-danger btn-sm" onclick="deleteClient({{ client.id }}, '{{ client.name }}')">
@@ -85,7 +85,7 @@
       <i class="fas fa-users fa-3x text-muted mb-3"></i>
       <h4 class="text-muted">Няма регистрирани клиенти</h4>
       <p class="text-muted">Добавете първия клиент, за да започнете.</p>
-      <a href="{{ url_for('add_client') }}" class="btn btn-primary">
+      <a href="{{ url_for('clients.add_client') }}" class="btn btn-primary">
         <i class="fas fa-plus me-1"></i>Добави клиент
       </a>
     </div>
@@ -111,4 +111,41 @@
     </div>
   </div>
 </div>
+
+<script>
+  let clientToDelete = null;
+
+function deleteClient(clientId, clientName) {
+  clientToDelete = clientId;
+  document.getElementById('clientNameToDelete').textContent = clientName;
+  const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+  deleteModal.show();
+}
+
+document.getElementById('confirmDelete').addEventListener('click', function() {
+  if (clientToDelete) {
+    fetch(`/clients/${clientToDelete}/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Грешка при изтриване на клиента: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Грешка при изтриване на клиента');
+    });
+    
+    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+    deleteModal.hide();
+  }
+});
+</script>
 {% endblock %}

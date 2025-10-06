@@ -14,6 +14,8 @@ class Client(db.Model):
     phone = db.Column(db.String(159), default="")
     email = db.Column(db.String(159), default="")
     company = db.Column(db.String(159), default="")
+    username = db.Column(db.String(1000), default=False)
+    password = db.Column(db.String(1000), default=False)
 
 class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +40,9 @@ class Invertor(db.Model):
     usage = db.Column(db.String(159), default="")
     power_to_zero = db.Column(db.Integer, default=0)
     alarms = db.Column(db.String(159), default="")
+    ip = db.Column(db.String(159), default="")
+    unit_id = db.Column(db.Integer, default=1)
+    port = db.Column(db.Integer, default=502)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -6,7 +6,7 @@
 <div class="row">
     <div class="col-md-10 mx-auto">
         <div class="card shadow">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header text-white">
                 <h4 class="mb-0">Добави нов клиент</h4>
             </div>
             <div class="card-body">
@@ -33,6 +33,14 @@
                         <div class="col-md-12">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="username" class="form-label">Потребителско име</label>
+                            <input type="username" class="form-control" id="username" name="username">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="password" class="form-label">Парола</label>
+                            <input type="password" class="form-control" id="password" name="password">
                         </div>
                     </div>
 
@@ -82,13 +90,25 @@
                             <label for="power_to_zero" class="form-label">Мощност до нула (%)</label>
                             <input type="number" class="form-control" id="power_to_zero" name="power_to_zero" min="0" max="100" placeholder="%">
                         </div>
+                        <div class="col-md-6">
+                            <label for="power_to_zero" class="form-label">IP</label>
+                            <input type="text" class="form-control" id="ip" name="ip" min="0" max="100" placeholder="255.255.255.255">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="power_to_zero" class="form-label">ID</label>
+                            <input type="number" class="form-control" id="unit_id" name="unit_id" min="0" max="100" placeholder="">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="power_to_zero" class="form-label">Порт</label>
+                            <input type="number" class="form-control" id="port" name="port" min="0" max="20000" placeholder="">
+                        </div>
                     </div>
 
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn button_accept">
                             <i class="fas fa-save me-1"></i>Добави клиент
                         </button>
-                        <a href="{{ url_for('clients') }}" class="btn btn-secondary">
+                        <a href="{{ url_for('clients.clients') }}" class="btn btn-secondary">
                             <i class="fas fa-times me-1"></i>Откажи
                         </a>
                     </div>

@@ -47,7 +47,11 @@
           <input type="checkbox" {% if client.telemechanics %}checked{% endif %}>
         </p>
 
-        <a href="#" class="btn btn-link">Детайли</a>
+        {% if client.invertors and client.invertors|length > 0 %}
+          <a href="{{ url_for('clients.client_details', invertor_id=client.invertors[0].id) }}" class="btn btn-link">Детайли</a>
+        {% else %}
+          <a href="#" class="btn btn-link disabled" tabindex="-1" aria-disabled="true">Детайли</a>
+        {% endif %}
       </div>
     </div>
   </div>
