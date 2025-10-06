@@ -4,6 +4,7 @@ from flask_login import login_required
 from models import db, Client, Schedule, Invertor, User
 from connect_modbus import SMARTLOGGER_CONFIG, read_modbus_value
 from pyModbusTCP.client import ModbusClient
+from datetime import datetime
 import threading
 import copy
 import json
@@ -72,6 +73,7 @@ def api_inverters():
     response.mimetype = 'application/json'
     return response
 
+
 @clients_bp.route('/client_details/<int:invertor_id>', methods=["GET"])
 @login_required
 def client_details(invertor_id):
@@ -84,7 +86,8 @@ def client_details(invertor_id):
             invertor_obj = inv
             break
     data = inverter_data[idx] if idx is not None and idx < len(inverter_data) else {"error": "Няма данни"}
-    return render_template("client_details.html", invertor=invertor_obj, data=data)
+    now = datetime.now()
+    return render_template("client_details.html", invertor=invertor_obj, data=data, now=now)
 
 @clients_bp.route('/clients', methods=["GET"])
 @login_required

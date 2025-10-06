@@ -11,17 +11,97 @@
   <div class="col-md-8 offset-md-2">
     <div class="card shadow">
       <div class="card-header text-white">
-        <h4 class="mb-0">Инвертор: {{ invertor.model }} (ID: {{ invertor.id }})</h4>
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">Инвертор: {{ invertor.model }} ({{ invertor.representative }})</h4>
+          <span class="badge bg-success" id="status-badge">Онлайн</span>
+        </div>
       </div>
       <div class="card-body">
+        
+        <div class="row mb-4">
+          <div class="col-md-6 mb-2">
+            <button class="btn btn-success w-100" id="start-btn">
+              <i class="fas fa-play me-2"></i>Стартирай
+            </button>
+          </div>
+          <div class="col-md-6 mb-2">
+            <button class="btn btn-danger w-100" id="stop-btn">
+              <i class="fas fa-stop me-2"></i>Спри
+            </button>
+          </div>
+          <div class="col-md-6 mb-2">
+            <button class="btn btn-warning w-100" id="reset-btn">
+              <i class="fas fa-redo me-2"></i>Рестартирай
+            </button>
+          </div>
+          <div class="col-md-6 mb-2">
+            <button class="btn btn-info w-100" id="settings-btn">
+              <i class="fas fa-cog me-2"></i>Настройки
+            </button>
+          </div>
+        </div>
+
+        <!-- Бързи действия -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2">Бързи действия:</h6>
+            <div class="btn-group w-100" role="group">
+              <button type="button" class="btn btn-outline-primary" data-power="25">25%</button>
+              <button type="button" class="btn btn-outline-primary" data-power="50">50%</button>
+              <button type="button" class="btn btn-outline-primary" data-power="75">75%</button>
+              <button type="button" class="btn btn-outline-primary" data-power="100">100%</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Данни от инвертора -->
+        <h6 class="border-bottom pb-2">Данни в реално време:</h6>
         <ul class="list-group mb-3" id="inverter-data">
-        {% for key, value in data.items() %}
+          {% for key, value in data.items() %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span>{{ key }}</span>
-            <span>{{ value }}</span>
+              <span>{{ key }}</span>
+              <span class="badge button_accept rounded-pill">{{ value }}</span>
             </li>
-        {% endfor %}
+          {% endfor %}
         </ul>
+
+        <!-- Допълнителна информация -->
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6 class="card-title"><i class="lni lni-stats-up"></i> Производителност</h6>
+                <div class="d-flex justify-content-between">
+                  <small>Днес:</small>
+                  <strong id="today-production">0 kWh</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <small>Този месец:</small>
+                  <strong id="month-production">0 kWh</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6 class="card-title"><i class="lni lni-bolt"></i> Енергия</h6>
+                <div class="d-flex justify-content-between">
+                  <small>Текуща мощност:</small>
+                  <strong id="current-power">0 kW</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <small>Обща произв.:</small>
+                  <strong id="total-production">0 kWh</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="card-footer text-muted">
+        Последно обновяване: <span id="last-update">{{ now.strftime('%H:%M:%S') }}</span>
       </div>
     </div>
   </div>
@@ -32,22 +112,119 @@ function updateCard() {
   fetch('/api/inverters')
     .then(r => r.json())
     .then(data => {
-      const invertorId = {{ invertor.id }};
+      const invertorId = {{ invertor.id|tojson }};
       const card = document.getElementById('inverter-data');
-      if (data[invertorId]) {
+      const lastUpdate = document.getElementById('last-update');
+      if (card && lastUpdate && data[invertorId]) {
         let html = '';
         for (const [key, value] of Object.entries(data[invertorId])) {
           html += `<li class="list-group-item d-flex justify-content-between align-items-center">
             <span>${key}</span>
-            <span>${value}</span>
+            <span class="badge button_accept rounded-pill">${value}</span>
           </li>`;
         }
         card.innerHTML = html;
+        const now = new Date();
+        lastUpdate.textContent = now.toLocaleTimeString();
       }
     });
 }
 
+// Функции за контролните бутони
+const startBtn = document.getElementById('start-btn');
+if (startBtn) {
+  startBtn.addEventListener('click', function() {
+    if(confirm('Сигурни ли сте, че искате да стартирате инвертора?')) {
+      fetch('/api/inverters/{{ invertor.id }}/start', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+          if(data.success) {
+            alert('Инверторът е стартиран успешно!');
+          } else {
+            alert('Грешка при стартиране: ' + data.message);
+          }
+        });
+    }
+  });
+}
+
+const stopBtn = document.getElementById('stop-btn');
+if (stopBtn) {
+  stopBtn.addEventListener('click', function() {
+    if(confirm('Сигурни ли сте, че искате да спрете инвертора?')) {
+      fetch('/api/inverters/{{ invertor.id }}/stop', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+          if(data.success) {
+            alert('Инверторът е спрян успешно!');
+          } else {
+            alert('Грешка при спиране: ' + data.message);
+          }
+        });
+    }
+  });
+}
+
+const resetBtn = document.getElementById('reset-btn');
+if (resetBtn) {
+  resetBtn.addEventListener('click', function() {
+    if(confirm('Сигурни ли сте, че искате да рестартирате инвертора?')) {
+      fetch('/api/inverters/{{ invertor.id }}/reset', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+          if(data.success) {
+            alert('Инверторът е рестартиран успешно!');
+          } else {
+            alert('Грешка при рестартиране: ' + data.message);
+          }
+        });
+    }
+  });
+}
+
+// Бутони за бързи мощности
+document.querySelectorAll('[data-power]').forEach(btn => {
+  if (btn) {
+    btn.addEventListener('click', function() {
+      const power = this.getAttribute('data-power');
+      if(confirm(`Задаване на мощност ${power}%?`)) {
+        fetch('/api/inverters/{{ invertor.id }}/set-power', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ power: power })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if(data.success) {
+            alert(`Мощността е зададена на ${power}%`);
+          } else {
+            alert('Грешка при задаване на мощност: ' + data.message);
+          }
+        });
+      }
+    });
+  }
+});
+
+// Автоматично обновяване
 setInterval(updateCard, 5000);
 updateCard();
 </script>
+
+<!-- Добавете Font Awesome за иконките -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+.btn-group .btn {
+  border-radius: 0;
+}
+.btn-group .btn:first-child {
+  border-top-left-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+.btn-group .btn:last-child {
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+}
+</style>
 {% endblock %}
